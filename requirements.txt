@@ -24,3 +24,4 @@ selenium~=4.34.0
 unstructured~=0.18.1
 serpapi
 pyowm
+PyPDF2

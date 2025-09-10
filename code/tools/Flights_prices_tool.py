@@ -2,6 +2,8 @@ from langchain.agents import tool
 import requests
 import os
 from dotenv import load_dotenv
+from .city_mapping import CITY_CODES
+
 load_dotenv()
 
 def minutes_to_hm(minutes: int) -> str:
@@ -113,13 +115,53 @@ def get_flight_prices(
     outboundDepartureDateEnd: str,
     inboundDepartureDateStart: str,
     inboundDepartureDateEnd: str
-) -> dict:
+):
     """
-    Fetches round-trip flight itineraries from the Kiwi API based on provided source, destination,
-    number of adults, currency, and required outbound/inbound departure date ranges.
-    Returns a simplified JSON with itinerary details including prices, flight durations,
-    seat availability, outbound/inbound flight details, and a human-readable summary.
+    Fetches round-trip flight itineraries from the Kiwi API.
+    
+    Args:
+        source: Source city (e.g., 'paris' or 'City:paris_fr')
+        destination: Destination city (e.g., 'milan' or 'City:milan_it')
+        adults: Number of adult passengers
+        currency: Currency code (e.g., 'USD', 'EUR')
+        outboundDepartureDateStart: Start date for outbound flight (YYYY-MM-DD)
+        outboundDepartureDateEnd: End date for outbound flight (YYYY-MM-DD)
+        inboundDepartureDateStart: Start date for return flight (YYYY-MM-DD)
+        inboundDepartureDateEnd: End date for return flight (YYYY-MM-DD)
+        
+    Returns:
+        dict: Flight information or error message
     """
+    import re
+    
+    # Clean and format city codes
+    def format_city_code(city_str):
+        # If it's already in the correct format, return as is
+        if isinstance(city_str, str) and city_str.startswith('City:'):
+            return city_str
+            
+        # Clean the input string
+        city_str = str(city_str).strip().lower()
+        
+        # Try to find matching city in our mapping
+        for code in CITY_CODES:
+            code_lower = code.lower()
+            if city_str in code_lower:
+                return code
+                
+        # If not found, try to construct a code
+        parts = re.split(r'[,_-]', city_str)
+        if len(parts) >= 2:
+            return f'City:{parts[0]}_{parts[-1][:2]}'  # e.g., 'milan_it'
+        
+        # Last resort: return as is with a warning
+        print(f"Warning: Could not find city code for: {city_str}")
+        return f'City:{city_str}'
+    
+    # Format source and destination
+    source = format_city_code(source)
+    destination = format_city_code(destination)
+
     url = "https://kiwi-com-cheap-flights.p.rapidapi.com/round-trip"
 
     querystring = {
@@ -147,7 +189,7 @@ def get_flight_prices(
         "outbound": "SUNDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY,MONDAY,TUESDAY",
         "transportTypes": "FLIGHT",
         "contentProviders": "FLIXBUS_DIRECTS,FRESH,KAYAK,KIWI",
-        "limit": "1",
+        "limit": "10",
         "outboundDepartureDateStart": outboundDepartureDateStart,
         "outboundDepartureDateEnd": outboundDepartureDateEnd,
         "inboundDepartureDateStart": inboundDepartureDateStart,
@@ -159,13 +201,40 @@ def get_flight_prices(
         "x-rapidapi-host": "kiwi-com-cheap-flights.p.rapidapi.com"
     }
 
+    # Log the actual request being made for debugging
+    print(f"Searching flights from {source} to {destination}")
+    print(f"Outbound: {outboundDepartureDateStart} to {outboundDepartureDateEnd}")
+    print(f"Inbound: {inboundDepartureDateStart} to {inboundDepartureDateEnd}")
+
     response = requests.get(url, headers=headers, params=querystring)
 
     try:
+        # Debug the API response
+        print(f"DEBUG - API Response Status: {response.status_code}")
+        print(f"DEBUG - API Response Headers: {dict(response.headers)}")
+        
+        if response.status_code != 200:
+            return {"error": f"API returned status {response.status_code}: {response.text}"}
+        
         raw_json = response.json()
-        return simplify_itineraries(raw_json)
+        print(f"DEBUG - Raw API Response: {str(raw_json)[:500]}...")
+        
+        simplified = simplify_itineraries(raw_json)
+        
+        # Add debug info to see how many flights were returned
+        total_flights = len(simplified.get("itineraries", []))
+        simplified["debug_info"] = {
+            "total_flights_found": total_flights,
+            "api_limit_requested": 20,
+            "source_formatted": source,
+            "destination_formatted": destination,
+            "api_status_code": response.status_code,
+            "raw_response_keys": list(raw_json.keys()) if isinstance(raw_json, dict) else "not_dict"
+        }
+        
+        return simplified
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": f"Exception in flight search: {str(e)}", "response_text": response.text[:200] if response else "No response"}
 
 
 # Step 3: Test the tool

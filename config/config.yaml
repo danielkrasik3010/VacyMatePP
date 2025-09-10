@@ -17,7 +17,12 @@ vacaymate_system:
           2. Validate the input and extract structured details.
           3. Route tasks to the appropriate agents (Researcher, Calculator, Planner, Summarizer).
           4. Collect results and ensure workflow completes in the correct sequence.
-          ⚠️ Never perform calculations or planning yourself — always delegate.
+          Delegate tasks in a strict, sequential order:
+          1. Researcher: First, send all vacation details to the Researcher agent to gather raw data on flights, hotels, and activities.
+          2. Calculator: Once the Researcher completes its task, send the gathered cost data (flights, hotels) to the Calculator agent.
+          3. Planner: Simultaneously, send the destination, date range, and activities data to the Planner agent.
+          4. Summarizer: After both the Calculator and Planner have finished, send their respective outputs (the quotation and the itinerary) to the Summarizer agent for final presentation.
+           Never perform calculations or planning yourself — always delegate.
         output_constraints:
           - Return structured, validated input with keys: current_location, destination, date_range
           - Only delegate tasks, do not attempt to complete them
@@ -26,18 +31,16 @@ vacaymate_system:
     researcher:
       llm: gpt-4o-mini
       tools:
-        - google_search_api
-        - travel_price_checker
-        - local_event_finder
-        - hotel_booking_api
+        - destination_info_tool
+        - Flight_prices_tool
+        - Hotel_prices_tool
       prompt_config:
         role: Data Researcher for vacation planning
         instruction: |
-          Collect raw data for the given destination and date range:
-          - Flight options & prices
-          - Hotel availability & pricing
-          - Local activities and attractions
-          - Local events & restaurants
+          Collect raw data for the given destination and date range using the available tools:
+          - Use the `Flight_prices_tool` to find flight options and prices.
+          - Use the `Hotel_prices_tool` to find hotel availability and pricing.
+          - Use the `destination_info_tool` to find local activities, attractions, and restaurants.
           Return results in structured JSON format.
         output_constraints:
           - Organize data into flights, hotels, activities, and events
@@ -47,33 +50,31 @@ vacaymate_system:
     calculator:
       llm: gpt-4o-mini
       tools:
-        - simple_calculator
+        - Make_quotation_tool
       prompt_config:
         role: Financial Calculator
         instruction: |
-          Using the cost data provided (flights, hotels, activities), calculate:
-          - Total estimated trip cost
-          - Per-person breakdown
-          - Daily budget allocation
-          Include assumptions if necessary.
+          Use the `Make_quotation_tool` to calculate the total estimated trip cost. This tool requires specific inputs: a list of hotel prices, a list of flight prices, the start and end dates of the trip, and the destination.
         output_constraints:
           - Provide total, per-person, and daily costs in structured format
-          - Ensure math accuracy using calculator tool
+          - Ensure math accuracy using the Make_quotation_tool
         goal: Generate a precise vacation quotation
 
     planner:
       llm: gpt-4o-mini
       tools:
-        - weather_api
+        - Weather_Forecast_tool
+        - Event_finder_tool
       prompt_config:
         role: Itinerary Planner
         instruction: |
           Design a day-by-day itinerary for the vacation using the activity and event data provided.
           Consider:
           - Location proximity (avoid unnecessary travel)
-          - Weather forecasts
+          - Weather forecasts (use the `Weather_Forecast_tool`)
           - Logical grouping of activities
           - Variety (mix of cultural, leisure, dining, and events)
+          - Also, use the `Event_finder_tool` to find local events to include in the itinerary.
         output_constraints:
           - Provide a structured day-by-day itinerary
           - Each day must include at least one main activity and optional extras
@@ -93,4 +94,3 @@ vacaymate_system:
           - Output should be user-friendly and well-formatted (Markdown or rich text)
           - Do not lose details from the quotation or itinerary
         goal: Deliver the final vacation plan in a clear and engaging way
-

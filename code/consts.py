@@ -32,6 +32,8 @@ DESTINATION = "destination"
 TRAVEL_DATES = "travel_dates"
 
 RESEARCH_RESULTS = "research_results"   # flights, hotels, activities
+PLANNER_RESULTS = "planner_results"     # itinerary and events data
+CALCULATOR_RESULTS = "calculator_results"  # financial calculations
 QUOTATION = "quotation"                 # cost breakdown
 ITINERARY_DRAFT = "itinerary_draft"     # raw daily plan
 FINAL_PLAN = "final_plan"               # polished summary

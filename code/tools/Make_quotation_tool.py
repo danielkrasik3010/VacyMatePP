@@ -59,24 +59,29 @@ def calculate_vacation_cost(
     avg_hotel_price = statistics.mean(hotel_prices)
     total_hotel = round((avg_hotel_price * num_days),2)
 
-    # 3. Avg flight price
+    # 3. Average flight price (already round-trip from API)
     avg_flight_price = statistics.mean(flight_prices)
 
     # 4. LLM daily spend
     daily_cost = ask_llm_for_daily_cost(destination)
     total_daily_spend = round((daily_cost * num_days), 2)
 
-    # 5. Final sum
+    # 5. Final sum before commission
     total_estimate = round((total_hotel + avg_flight_price + total_daily_spend), 2)
-    quotation = total_estimate*1.1  # adding 10% commission
+    
+    # 6. Final quotation with 10% commission
+    quotation = round((total_estimate * 1.1), 2)
 
     return {
         "days": num_days,
         "hotel_total": total_hotel,
-        "flight_avg": avg_flight_price,
+        "flight_total": avg_flight_price,
         "daily_cost_estimate": daily_cost,
         "daily_total": total_daily_spend,
-        "total_estimate": total_estimate
+        "subtotal": total_estimate,
+        "commission_rate": 0.1,
+        "commission_amount": round((total_estimate * 0.1), 2),
+        "final_quotation": quotation
     }
 
 
@@ -91,4 +96,4 @@ if __name__ == "__main__":
     result = calculate_vacation_cost(fake_hotels, fake_flights, start, end, destination)
     print("Vacation Cost Breakdown:", result)
 
-    print('the quotation for all the vacation is :', round(result['total_estimate']*1.1, 2))
+    print('Final quotation with commission:', result['final_quotation'])
