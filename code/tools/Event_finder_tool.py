@@ -25,7 +25,7 @@ SERPAPI_API_KEY = '297fdf48a26d5137d7068c6a7f7341cf0db14c16212b9a3eade05f4768521
 # ========================================================================
 
 @tool
-def local_event_finder(
+def search_events(
     location: str,
     start_date: str,
     end_date: str,
@@ -38,7 +38,7 @@ def local_event_finder(
     """
     try:
         if GoogleSearch is None:
-            return json.dumps([
+            return [
                 {
                     "title": "Sample Event 1",
                     "formatted_date": "Sep 16 - 7:00 PM",
@@ -53,7 +53,7 @@ def local_event_finder(
                     "link": "https://example.com/event2",
                     "description": "Another sample event"
                 }
-            ], indent=2)
+            ]
         
         query = f"Events in {location}"
         if event_type:
@@ -101,9 +101,9 @@ def local_event_finder(
         
         # Return first 15 events
         simplified = simplified[:15]
-        return json.dumps(simplified, indent=2)
+        return simplified
     except Exception as e:
-        return f"Error with Local Event Finder: {e}"
+        return [{"title": "Error", "description": f"Error with Local Event Finder: {e}", "venue": "N/A", "formatted_date": "N/A"}]
 
 
 
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     today = datetime.date.today()
     next_week = today + datetime.timedelta(days=7)
     print("Testing Local Event Finder...")
-    event_result = local_event_finder.invoke({
+    event_result = search_events.invoke({
         "location": "New York",
         "start_date": today.strftime("%Y-%m-%d"),
         "end_date": next_week.strftime("%Y-%m-%d"),

@@ -1,4 +1,3 @@
-
 import os
 import json
 import datetime
@@ -16,11 +15,11 @@ load_dotenv()
 OWM_API_KEY = 'c9e4f702cc39e83c223bb81911f03aa8'
 
 # ========================================================================
-#  WEATHER FORECAST TOOL (with human-readable summary)
+#   WEATHER FORECAST TOOL (with human-readable summary)
 # ========================================================================
 
 @tool
-def weather_forecast_tool(location: str, days: int = 5, units: str = "metric") -> str:
+def get_weather_forecast(location: str, days: int = 5, units: str = "metric") -> str:
     """
     Retrieves daily weather forecasts for the next 'days' days.
     Returns date, condition, temp_high, temp_low, wind, humidity, precipitation.
@@ -66,13 +65,16 @@ def weather_forecast_tool(location: str, days: int = 5, units: str = "metric") -
                 f"Wind: {info['wind_speed']} units, Humidity: {info['humidity']}%, Precipitation: {info['precipitation']} units."
             )
 
-        return json.dumps({
+        return {
             "forecasts": simplified_forecasts,
             "human_readable_summary": " ".join(summary_lines)
-        }, indent=2)
+        }
 
     except Exception as e:
-        return f"Error with Weather Forecast Tool: {e}"
+        return {
+            "forecasts": [],
+            "human_readable_summary": f"Error with Weather Forecast Tool: {e}"
+        }
 
 # ========================================================================
 # 5. TESTING THE TOOLS
@@ -82,7 +84,7 @@ if __name__ == "__main__":
     today = datetime.date.today()
     next_week = today + datetime.timedelta(days=7)
     print("Testing Weather Forecast Tool...")
-    weather_result = weather_forecast_tool.invoke({
+    weather_result = get_weather_forecast.invoke({
         "location": "London",
         "days": 5,
         "units": "metric"

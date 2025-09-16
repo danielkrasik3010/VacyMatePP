@@ -1,23 +1,90 @@
-
-
-
-
-# .env
-
-
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
+# PyInstaller
+*.manifest
+*.spec
 
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
-# Environments
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual environments
 .env
 .venv
 env/
 venv/
+ENV/
+env.bak/
+venv.bak/
 
-# DB
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-vector_db/
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+*.log
+.streamlit/
+outputs/*.txt
+outputs/*.json
+outputs/debug_log_*.txt
+
+# API Keys and secrets
+.env.local
+.env.production
+config.yaml
+reasoning.yaml
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/

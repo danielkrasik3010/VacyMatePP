@@ -8,8 +8,9 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+TAVILY_API_KEY = os.getenv('TAVILY_API_KEY', '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')
+
 # Load the Tavily API key from your environment variables
-TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 def _scrape_and_process_urls(urls: List[str]) -> List[Dict[str, Any]]:
     """
@@ -42,7 +43,7 @@ def _scrape_and_process_urls(urls: List[str]) -> List[Dict[str, Any]]:
     return results
 
 @tool
-def tavily_search_and_extract(query: str, num_results: int = 5) -> str:
+def get_destination_info(query: str, num_results: int = 5) -> str:
     """
     Performs a web search and extracts content from the most relevant results.
 
@@ -101,7 +102,7 @@ if __name__ == "__main__":
     full_path = os.path.join(output_dir, output_filename)
     
     # Get the extracted data as a formatted JSON string
-    extracted_data = tavily_search_and_extract.invoke("best things to do in Paris")
+    extracted_data =  get_destination_info.invoke("best things to do in Sofia")
     
     # Check if the output directory exists, if not, create it
     if not os.path.exists(output_dir):

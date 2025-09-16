@@ -1,12 +1,20 @@
-# VacayMate — AI-Powered Vacation Planning Assistant
+# 🌍 VacayMate - AI Travel Planner
 
-**An intelligent multi-agent system for comprehensive vacation planning**
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io)
+[![LangChain](https://img.shields.io/badge/LangChain-0.3+-green.svg)](https://langchain.com)
+[![LangGraph](https://img.shields.io/badge/LangGraph-0.4+-purple.svg)](https://langgraph.com)
 
-VacayMate is an AI-powered vacation planning assistant that uses multiple specialized agents to research destinations, find flights and hotels, calculate costs, create itineraries, and generate complete vacation plans. The system leverages LangGraph for orchestrating agent workflows and integrates with various APIs to provide real-time travel data.
+VacayMate is an intelligent AI-powered travel planning system that creates comprehensive vacation itineraries by orchestrating multiple specialized agents. Built with LangGraph and featuring a beautiful Streamlit UI, it provides real-time flight prices, hotel recommendations, weather forecasts, local events, and detailed cost breakdowns.
 
----
+## ✨ Features
 
-## Table of Contents
+### 🤖 Multi-Agent Architecture
+- **Manager Agent**: Orchestrates the entire planning workflow
+- **Researcher Agent**: Gathers flight, hotel, and destination data
+- **Calculator Agent**: Provides detailed cost analysis and quotations
+- **Planner Agent**: Creates itineraries with weather and events
+- **Summarizer Agent**: Compiles everything into a comprehensive plan
 
 - [Overview](#overview)
 - [System Architecture](#system-architecture)
@@ -22,20 +30,21 @@ VacayMate is an AI-powered vacation planning assistant that uses multiple specia
 - [Contact & License](#contact--license)
 - [Code Statistics](#code-statistics)
 
----
+### 🛠️ Core Capabilities
+- ✈️ **Real-time Flight Search** - Live prices from multiple airlines with duration calculations
+- 🏨 **Hotel Recommendations** - Detailed hotel data with real addresses and coordinates
+- 🌍 **Dynamic Destination Research** - Attractions and activities specific to your destination
+- 🌤️ **Weather Forecasting** - 5-day weather outlook for your trip
+- 🎉 **Local Events Discovery** - Find events and activities during your stay
+- 💰 **Comprehensive Cost Analysis** - Detailed breakdown with commission calculations
+- 📄 **Markdown Export** - Download your complete vacation plan
 
-## Overview
-
-VacayMate transforms vacation planning into an automated, intelligent process. **Key capabilities include:**
-
-- Multi-agent workflow orchestration using LangGraph
-- Real-time flight and hotel price research
-- Weather forecasting and local event discovery
-- Automated cost calculation with commission handling
-- Day-by-day itinerary generation
-- Professional vacation plan document generation
-
-The system ensures that vacation plans are **comprehensive, cost-effective, and personalized**.
+### 🎨 Beautiful UI
+- Modern Streamlit interface with gradient designs
+- Responsive tables and cards
+- Interactive tabs for organized information
+- Real-time progress indicators
+- Mobile-friendly design
 
 ---
 
@@ -89,7 +98,80 @@ VacayMate uses a sophisticated multi-agent architecture where specialized agents
       │     END     │
       └─────────────┘
 ```
+## 🚀 Quick Start
 
+### Prerequisites
+- Python 3.8+
+- API Keys for:
+  - OpenAI/Groq (for LLM)
+  - Tavily (for destination research)
+  - SerpAPI (for hotel search)
+  - RapidAPI (for flight prices)
+  - OpenWeatherMap (for weather)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/danielkrasik3010/VacayMate.git
+   cd VacayMate
+   ```
+
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Set up environment variables**
+   Create a `.env` file in the root directory:
+   ```env
+   OPENAI_API_KEY=your_openai_key
+   GROQ_API_KEY=your_groq_key
+   TAVILY_API_KEY=your_tavily_key
+   SERPAPI_API_KEY=your_serpapi_key
+   RAPIDAPI_KEY=your_rapidapi_key
+   OPENWEATHER_API_KEY=your_openweather_key
+   ```
+
+5. **Run the Streamlit app**
+   ```bash
+   cd UI
+   streamlit run app.py
+   ```
+
+## 📁 Project Structure
+
+```
+VacayMate/
+├── code/                          # Core system code
+│   ├── tools/                     # Agent tools
+│   │   ├── destination_info_tool.py
+│   │   ├── Flights_prices_tool.py
+│   │   ├── Hotels_prices_tool.py
+│   │   ├── Weather_Forecast_tool.py
+│   │   └── Event_finder_tool.py
+│   ├── nodes/                     # Agent implementations
+│   │   └── VacayMate_nodes.py
+│   ├── graphs/                    # LangGraph workflow
+│   │   └── VacayMate_graph.py
+│   ├── states/                    # State management
+│   │   └── VacayMate_state.py
+│   └── VacayMate_system.py       # Main system class
+├── UI/                           # Streamlit interface
+│   ├── app.py                    # Main UI application
+│   ├── requirements.txt          # UI dependencies
+│   └── README.md                 # UI documentation
+├── outputs/                      # Generated vacation plans
+├── config/                       # Configuration files
+├── requirements.txt              # Main dependencies
+└── README.md                     # This file
+```
 ---
 
 ## Core Agents
@@ -224,209 +306,106 @@ vacaymate_system:
       llm: gpt-4o-mini
 ```
 
-### Environment Variables (`.env`)
 
-```env
-OPENAI_API_KEY=sk-...
-GROQ_API_KEY=...
-SERPAPI_API_KEY=...
-OPENWEATHERMAP_API_KEY=...
-TAVILY_API_KEY=...
-```
 
----
+## 🔧 Configuration
 
-## Repository Structure
+### API Keys Setup
+The system requires several API keys for full functionality:
 
-```
-VacayMate/
-├── code/
-│   ├── graphs/
-│   │   ├── VacayMate_graph.py
-│   │   ├── __init__.py
-│   ├── nodes/
-│   │   ├── VacayMate_nodes.py
-│   │   ├── __init__.py
-│   ├── states/
-│   │   ├── VacayMate_state.py
-│   │   └── __init__.py
-│   ├── tools/
-│   │   ├── Event_finder_tool.py
-│   │   ├── Flights_prices_tool.py
-│   │   ├── Hotels_prices_tool.py
-│   │   ├── Make_quotation_tool.py
-│   │   ├── Weather_Forecast_tool.py
-│   │   ├── city_mapping.py
-│   │   └── destination_info_tool.py
-│   ├── VacayMate_system.py
-│   ├── consts.py
-│   ├── llm.py
-│   ├── prompt_builder.py
-│   └── utils.py
-├── config/
-│   ├── config.yaml
-│   └── reasoning.yaml
-├── outputs/
-│   └── .gitignore
-├── .gitignore
-├── LICENSE
-├── README.md
-├── requirements.txt
-├── system_graph_VacayMate.png
-└── tools_descreption.docx
-```
+1. **LLM Provider** (Choose one):
+   - OpenAI: `OPENAI_API_KEY`
+   - Groq: `GROQ_API_KEY`
 
----
+2. **Data Sources**:
+   - Tavily (destination info): `TAVILY_API_KEY`
+   - SerpAPI (hotels): `SERPAPI_API_KEY`
+   - RapidAPI (flights): `RAPIDAPI_KEY`
+   - OpenWeatherMap: `OPENWEATHER_API_KEY`
 
-## Quickstart
+### System Configuration
+Edit `config/config.yaml` to customize:
+- Agent prompts and behaviors
+- API rate limits
+- Output formats
+- Cost calculation parameters
 
-**Clone & install dependencies:**
+## 🎯 Usage Examples
 
-```bash
-git clone https://github.com/your-username/VacayMate
-cd VacayMate
-python -m venv venv
-# Activate the virtual environment
-# macOS / Linux:
-source venv/bin/activate
-# Windows:
-# venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-**Configure environment variables:**
-
-```bash
-cp .env.example .env
-# Edit .env with your API keys
-```
-
-**Run the vacation planner:**
-
-```bash
-python code/VacayMate_system.py
-```
----
-
-## Demo Usage
-
-**Example vacation request:**
-
+### Basic Trip Planning
 ```python
-user_request = {
-    "user_request": "I want to plan a vacation",
-    "current_location": "barcelona",
-    "destination": "paris",
-    "travel_dates": "2025-09-15 to 2025-09-20",
-}
+from code.VacayMate_system import VacayMate
+
+# Initialize the system
+vacay_mate = VacayMate(llm_model="gpt-4o-mini")
+
+# Plan a trip
+result = vacay_mate.run(
+    user_request="Plan a 5-day trip to Paris",
+    current_location="Barcelona",
+    destination="Paris",
+    start_date="2024-06-15",
+    return_date="2024-06-20"
+)
 ```
 
-**Generated output includes:**
+### Advanced Configuration
+```python
+# Custom configuration
+vacay_mate = VacayMate(
+    llm_model="groq/mixtral-8x7b-32768",
+    max_hotels=10,
+    max_events=15
+)
+```
 
-- Flight options with prices and schedules
-- Hotel recommendations with ratings and costs
-- Weather forecasts for travel dates
-- Local events and attractions
-- Day-by-day detailed itinerary
-- Complete cost breakdown with commission
-- Professional vacation plan document
+## 🔄 System Workflow
 
----
+1. **Input Processing**: User provides trip details
+2. **Research Phase**: Gather flights, hotels, and destination info
+3. **Planning Phase**: Create itinerary with weather and events
+4. **Cost Analysis**: Calculate comprehensive pricing
+5. **Summarization**: Compile final vacation plan
+6. **Export**: Generate downloadable Markdown report
 
-## Implementation Notes
+## 🛠️ Recent Improvements
 
-### LLM Support
+### Fixed Issues ✅
+- **Dynamic Attractions**: Now shows real destination attractions instead of hardcoded Paris data
+- **Flight Duration**: Correct calculation and display (e.g., "2h 30m" instead of "120h")
+- **Hotel Addresses**: Real street addresses instead of generic "central area"
 
-- **OpenAI**: GPT-4o-mini, GPT-4o (primary)
-- **Groq**: Llama models (cost-effective alternative)
-- Configurable model selection per agent
+### Enhanced Data Display 📊
+- **Hotel Table**: Added coordinates, hotel class, total price, booking links
+- **Flight Table**: Added cabin class, available seats, EUR pricing, return flight details
+- **Attraction Parsing**: Intelligent extraction from research content
 
-### API Integrations
+## 🤝 Contributing
 
-- **SerpAPI**: Flight and hotel data, event discovery
-- **OpenWeatherMap**: Weather forecasting
-- **Tavily**: Destination research
-- Rate limiting and error handling implemented
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### State Management
+## 📝 License
 
-- LangGraph state management for agent coordination
-- Persistent state across agent transitions
-- Error recovery and retry mechanisms
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
+## 🙏 Acknowledgments
 
-## Extending the Project
+- Built with [LangChain](https://langchain.com) and [LangGraph](https://langgraph.com)
+- UI powered by [Streamlit](https://streamlit.io)
+- Data sources: Tavily, SerpAPI, RapidAPI, OpenWeatherMap
+- AI models: OpenAI GPT-4, Groq Mixtral
 
-### Adding New Agents
+## 📞 Support
 
-1. Create agent function in `nodes/VacayMate_nodes.py`
-2. Add agent configuration to `config/config.yaml`
-3. Update graph structure in `graphs/VacayMate_graph.py`
-4. Define state variables in `states/VacayMate_state.py`
-
-### Adding New Tools
-
-1. Create tool file in `tools/` directory
-2. Implement tool with `@tool` decorator
-3. Add tool to relevant agent configurations
-4. Update tool imports in agent nodes
-
-### Custom LLM Integration
-
-1. Add model configuration to `llm.py`
-2. Update `config.yaml` with new model options
-3. Test with existing agent workflows
-
----
-
-## Development Tips
-
-### Debugging
-
-- Enable verbose logging in agent executors
-- Use `test_*.py` files for component testing
-- Check `outputs/` directory for generated plans
-
-### Performance Optimization
-
-- Adjust `max_retries` and `timeout_seconds` in config
-- Optimize tool response parsing
-- Consider caching for repeated API calls
-
-### Cost Management
-
-- Use Groq models for cost-effective processing
-- Monitor API usage across all integrated services
-- Implement request batching where possible
+For questions, issues, or contributions:
+- 🐛 [Report bugs](https://github.com/danielkrasik3010/VacayMate/issues)
+- 💡 [Request features](https://github.com/danielkrasik3010/VacayMate/issues)
+- 📧 Contact: [GitHub Profile](https://github.com/danielkrasik3010)
 
 ---
 
-## Code Statistics
-
-### Performance Metrics That Impress
-- **Planning Time:** 3-5 minutes (vs. 6+ hours manual)
-- **Data Sources:** 6+ real-time APIs
-- **Agent Coordination:** 5 specialized AI agents
-- **Output Quality:** Publication-ready documentation
-- **Cost Accuracy:** Real-time pricing with commission analysis
-- **Itinerary Precision:** Weather-optimized daily schedules
-- **Codebase Scale:** 2,860+ lines of production Python code across 22 modules
-
----
-
-## Contact & License
-
-**Author**: Daniel Krasik  
-**Email**: daniel.krasik3010@gmail.com  
-**License**: MIT License
-
----
-
-## Credits
-
-1. **Ready Tensor AI Course** - Educational foundation
-2. **LangGraph** - Multi-agent orchestration framework
-3. **SerpAPI** - Travel data APIs
-4. **OpenWeatherMap** - Weather forecasting
-5. **Tavily** - Web search and research
+**Made with ❤️ by [Daniel Krasik](https://github.com/danielkrasik3010)**

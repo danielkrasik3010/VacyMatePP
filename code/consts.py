@@ -1,9 +1,8 @@
-# roles_and_constraints.py
-
-# Roles
+import os
 from enum import Enum
 
 
+# Roles
 class ROLE(Enum):
     HUMAN = "human"
     AI = "ai"
@@ -16,6 +15,7 @@ RESEARCHER = "researcher"
 CALCULATOR = "calculator"
 PLANNER = "planner"
 SUMMARIZER = "summarizer"
+MERGE_RESULTS = "merge_results"  # Added this constant
 
 # TOOLS
 SEARCH_TOOL = "google_search_api"
@@ -31,12 +31,12 @@ CURRENT_LOCATION = "current_location"
 DESTINATION = "destination"
 TRAVEL_DATES = "travel_dates"
 
-RESEARCH_RESULTS = "research_results"   # flights, hotels, activities
-PLANNER_RESULTS = "planner_results"     # itinerary and events data
+RESEARCH_RESULTS = "research_results"  # flights, hotels, activities
+PLANNER_RESULTS = "planner_results"    # itinerary and events data
 CALCULATOR_RESULTS = "calculator_results"  # financial calculations
-QUOTATION = "quotation"                 # cost breakdown
-ITINERARY_DRAFT = "itinerary_draft"     # raw daily plan
-FINAL_PLAN = "final_plan"               # polished summary
+QUOTATION = "quotation"              # cost breakdown
+ITINERARY_DRAFT = "itinerary_draft"    # raw daily plan
+FINAL_PLAN = "final_plan"            # polished summary
 
 # MESSAGES (for LangSmith observability & debugging)
 MANAGER_MESSAGES = "manager_messages"

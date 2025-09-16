@@ -1,7 +1,7 @@
 import os
 import datetime
 import statistics
-from typing import List, Dict
+from typing import List, Dict, Any
 from groq import Groq
 from dotenv import load_dotenv
 
@@ -39,16 +39,35 @@ def ask_llm_for_daily_cost(destination: str, max_retries: int = 3) -> float:
                 continue
             raise ValueError(f"LLM did not return a valid number after {max_retries} tries. Got: {result}")
 
-def calculate_vacation_cost(
+from langchain.agents import tool
+
+@tool
+def make_quotation(
     hotel_prices: List[float],
     flight_prices: List[float],
     start_date: str,
     end_date: str,
     destination: str
-) -> Dict[str, float]:
+) -> Dict[str, Any]:
     """
     Calculate total vacation cost given hotel/flight prices and destination.
+    
+    Args:
+        hotel_prices: List of hotel prices per night (can be string or float)
+        flight_prices: List of flight prices (round-trip, can be string or float)
+        start_date: Start date in YYYY-MM-DD format
+        end_date: End date in YYYY-MM-DD format
+        destination: Name of the destination city
+        
+    Returns:
+        Dict containing cost breakdown including hotel, flights, daily expenses, and total with commission
     """
+    # Ensure prices are floats
+    try:
+        hotel_prices = [float(price) if isinstance(price, str) else float(price) for price in hotel_prices]
+        flight_prices = [float(price) if isinstance(price, str) else float(price) for price in flight_prices]
+    except (ValueError, TypeError) as e:
+        return {"error": f"Invalid price format: {str(e)}"}
 
     # 1. Number of days
     d1 = datetime.datetime.strptime(start_date, "%Y-%m-%d")
@@ -93,7 +112,15 @@ if __name__ == "__main__":
     end = "2025-07-08"
     destination = "Barcelona"
 
-    result = calculate_vacation_cost(fake_hotels, fake_flights, start, end, destination)
+    result = make_quotation.invoke(
+        input={
+            "hotel_prices": fake_hotels,
+            "flight_prices": fake_flights,
+            "start_date": start,
+            "end_date": end,
+            "destination": destination,
+        }
+    )
     print("Vacation Cost Breakdown:", result)
 
     print('Final quotation with commission:', result['final_quotation'])

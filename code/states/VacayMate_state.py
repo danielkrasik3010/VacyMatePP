@@ -1,13 +1,12 @@
-
-# state.py
-
 from typing import List, TypedDict, Optional, Dict, Any
+from pydantic import BaseModel, Field
 from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.graph.message import AnyMessage, add_messages
 from typing_extensions import Annotated
+import operator
 
 # ---------------- FLIGHTS ---------------- #
-class FlightLeg(TypedDict):
+class FlightLeg(BaseModel):
     source: str
     sourceCode: str
     destination: str
@@ -19,7 +18,7 @@ class FlightLeg(TypedDict):
     cabinClass: str
     summary: str
 
-class FlightItinerary(TypedDict):
+class FlightItinerary(BaseModel):
     id: str
     priceUSD: float
     priceEUR: float
@@ -31,59 +30,60 @@ class FlightItinerary(TypedDict):
     bookingUrl: str
     human_readable_summary: str
 
-class FlightSearchResult(TypedDict):
-    itineraries: List[FlightItinerary]
+class FlightSearchResult(BaseModel):
+    itineraries: List[FlightItinerary] = Field(default_factory=list)
 
 # ---------------- HOTELS ---------------- #
-class HotelPrice(TypedDict):
+class HotelPrice(BaseModel):
     per_night: str
     per_night_value: float
     total: str
     total_value: float
 
-class HotelAddress(TypedDict):
+class HotelAddress(BaseModel):
     latitude: float
     longitude: float
     formatted: str
 
-class Hotel(TypedDict):
+class Hotel(BaseModel):
     name: str
-    description: Optional[str]
-    rating: Optional[float]
-    hotel_class: Optional[str]
+    description: Optional[str] = None
+    rating: Optional[float] = None
+    hotel_class: Optional[str] = None
     price: HotelPrice
     address: HotelAddress
-    check_in: Optional[str]
-    check_out: Optional[str]
+    check_in: Optional[str] = None
+    check_out: Optional[str] = None
     summary: str
 
-class HotelSearchResult(TypedDict):
+# Updated to match the JSON output from the tool
+class HotelSearchResult(BaseModel):
     query: str
-    check_in: str
-    check_out: str
-    total_found: int
-    hotels: List[Hotel]
+    check_in_date: str
+    check_out_date: str
+    total_found: int = 0
+    hotels: List[Hotel] = Field(default_factory=list)
 
 # ---------------- ATTRACTIONS ---------------- #
-class Attraction(TypedDict):
+class Attraction(BaseModel):
     name: str
     description: str
     type: str
     location: str
 
 # ---------------- EVENTS ---------------- #
-class EventDate(TypedDict):
+class EventDate(BaseModel):
     start_date: str
     when: str
 
-class Event(TypedDict):
+class Event(BaseModel):
     title: str
     date: EventDate
-    venue: Optional[str]
+    venue: Optional[str] = None
     link: str
 
 # ---------------- WEATHER ---------------- #
-class WeatherForecast(TypedDict):
+class WeatherForecast(BaseModel):
     date: str
     condition: str
     temp_high: float
@@ -92,111 +92,111 @@ class WeatherForecast(TypedDict):
     humidity: int
     precipitation: float
 
-class WeatherForecastResult(TypedDict):
-    forecasts: List[WeatherForecast]
+class WeatherForecastResult(BaseModel):
+    forecasts: List[WeatherForecast] = Field(default_factory=list)
     human_readable_summary: str
 
 # ---------------- RESEARCH RESULTS ---------------- #
-class ResearchResults(TypedDict):
+class ResearchResults(BaseModel):
     """Raw data collected by Researcher agent."""
-    flights: FlightSearchResult
-    accommodations: HotelSearchResult
-    attractions: List[Attraction]
-    tavily_research: Optional[List[Dict[str, Any]]]
+    flights: FlightSearchResult = Field(default_factory=FlightSearchResult)
+    accommodations: HotelSearchResult = Field(default_factory=HotelSearchResult)
+    attractions: List[Attraction] = Field(default_factory=list)
+    tavily_research: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
 
 # ---------------- PLANNER RESULTS ---------------- #
-class PlannerResults(TypedDict):
+class PlannerResults(BaseModel):
     """Processed itinerary data from Planner agent."""
-    weather_forecast: Optional[WeatherForecastResult]
-    local_events: List[Event]
+    weather_forecast: Optional[WeatherForecastResult] = None
+    local_events: List[Event] = Field(default_factory=list)
 
 # ---------------- CALCULATOR RESULTS ---------------- #
-class CalculatorResults(TypedDict):
+class CalculatorResults(BaseModel):
     """Financial outputs from Calculator agent."""
-    quotation: Dict[str, Any]
+    quotation: Dict[str, Any] = Field(default_factory=dict)
 
 # ---------------- AGENT PROMPTS ---------------- #
-class AgentPromptConfig(TypedDict):
+class AgentPromptConfig(BaseModel):
     role: str
     instruction: str
-    output_constraints: List[str]
+    output_constraints: List[str] = Field(default_factory=list)
     goal: str
 
 # ---------------- STATE ---------------- #
 class VacationPlannerState(TypedDict):
-    # User input
+    # User input - these should not be modified after initialization
     user_request: str
     current_location: str
     destination: str
     travel_dates: str
+    start_date: str
+    return_date: str
 
-    # Agent message histories
-    manager_messages: Annotated[list[AnyMessage], add_messages]
-    researcher_messages: Annotated[list[AnyMessage], add_messages]
-    calculator_messages: Annotated[list[AnyMessage], add_messages]
-    planner_messages: Annotated[list[AnyMessage], add_messages]
-    summarizer_messages: Annotated[list[AnyMessage], add_messages]
+    # Agent message histories - use add_messages for safe concurrent updates
+    manager_messages: Annotated[List[str], add_messages]
+    researcher_messages: Annotated[List[str], add_messages]
+    calculator_messages: Annotated[List[str], add_messages]
+    planner_messages: Annotated[List[str], add_messages]
+    summarizer_messages: Annotated[List[str], add_messages]
 
-    # Agent outputs
-    research_results: ResearchResults
-    planner_results: PlannerResults
-    calculator_results: CalculatorResults
+    # Agent outputs - these should be updated by single agents only
+    research_results: Dict[str, Any]
+    planner_results: Dict[str, Any]
+    calculator_results: Dict[str, Any]
 
-    # Prompts from config
-    manager_prompt: AgentPromptConfig
-    researcher_prompt: AgentPromptConfig
-    calculator_prompt: AgentPromptConfig
-    planner_prompt: AgentPromptConfig
-    summarizer_prompt: AgentPromptConfig
+    # Prompts from config - should not be modified after initialization
+    manager_prompt: Dict[str, Any]
+    researcher_prompt: Dict[str, Any]
+    calculator_prompt: Dict[str, Any]
+    planner_prompt: Dict[str, Any]
+    summarizer_prompt: Dict[str, Any]
+    
+    # Tools available to agents - should not be modified after initialization
+    tools: List[Dict[str, Any]]
 
-    # Drafts and final outputs
+    # Drafts and final outputs - updated by single agents only
     itinerary_draft: str
     final_plan: str
     plan_approved: bool
 
 # ---------------- INITIALIZATION ---------------- #
 def initialize_vacation_state(
-    user_request: str,
-    current_location: str,
-    destination: str,
-    travel_dates: str,
-    manager_prompt_cfg: dict,
-    researcher_prompt_cfg: dict,
-    calculator_prompt_cfg: dict,
-    planner_prompt_cfg: dict,
-    summarizer_prompt_cfg: dict,
+    user_request: str = "",
+    current_location: str = "",
+    destination: str = "",
+    start_date: str = "",
+    return_date: str = "",
+    manager_prompt_cfg: Optional[dict] = None,
+    researcher_prompt_cfg: Optional[dict] = None,
+    calculator_prompt_cfg: Optional[dict] = None,
+    planner_prompt_cfg: Optional[dict] = None,
+    summarizer_prompt_cfg: Optional[dict] = None,
+    tools: Optional[List[Dict[str, Any]]] = None,
 ) -> VacationPlannerState:
     """Initialize the VacayMate state with default values."""
-    return VacationPlannerState(
-        user_request=user_request,
-        current_location=current_location,
-        destination=destination,
-        travel_dates=travel_dates,
-        manager_messages=[],
-        researcher_messages=[],
-        calculator_messages=[],
-        planner_messages=[],
-        summarizer_messages=[],
-        research_results={
-            "flights": {},
-            "accommodations": {},
-            "attractions": [],
-            "tavily_research": [],
-        },
-        planner_results={
-            "weather_forecast": None,
-            "local_events": [],
-        },
-        calculator_results={
-            "quotation": {},
-        },
-        manager_prompt=manager_prompt_cfg,
-        researcher_prompt=researcher_prompt_cfg,
-        calculator_prompt=calculator_prompt_cfg,
-        planner_prompt=planner_prompt_cfg,
-        summarizer_prompt=summarizer_prompt_cfg,
-        itinerary_draft="",
-        final_plan="",
-        plan_approved=False,
-    )
-
+    # Create a dict that matches the TypedDict structure
+    return {
+        "user_request": user_request,
+        "current_location": current_location,
+        "destination": destination,
+        "travel_dates": f"{start_date} to {return_date}" if start_date and return_date else "",
+        "start_date": start_date,
+        "return_date": return_date,
+        "manager_messages": [],
+        "researcher_messages": [],
+        "calculator_messages": [],
+        "planner_messages": [],
+        "summarizer_messages": [],
+        "research_results": {},
+        "planner_results": {},
+        "calculator_results": {},
+        "manager_prompt": manager_prompt_cfg or {},
+        "researcher_prompt": researcher_prompt_cfg or {},
+        "calculator_prompt": calculator_prompt_cfg or {},
+        "planner_prompt": planner_prompt_cfg or {},
+        "summarizer_prompt": summarizer_prompt_cfg or {},
+        "tools": tools or [],
+        "itinerary_draft": "",
+        "final_plan": "",
+        "plan_approved": False
+    }
