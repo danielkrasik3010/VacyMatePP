@@ -17,7 +17,7 @@ load_dotenv()
 # The following API keys are placeholders and should be loaded from your .env file
 # as shown in the original code. For this example, they are hardcoded
 # to make the code self-contained and runnable.
-SERPAPI_API_KEY = '297fdf48a26d5137d7068c6a7f7341cf0db14c16212b9a3eade05f4768521453'
+SERPAPI_API_KEY = '---------'
 
 
 # ========================================================================
