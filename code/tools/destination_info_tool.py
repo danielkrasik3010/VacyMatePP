@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-TAVILY_API_KEY = os.getenv('TAVILY_API_KEY', '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')
+TAVILY_API_KEY = os.getenv('TAVILY_API_KEY', '-------------')
 
 # Load the Tavily API key from your environment variables
 
