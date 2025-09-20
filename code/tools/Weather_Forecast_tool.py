@@ -12,7 +12,7 @@ load_dotenv()
 # The following API keys are placeholders and should be loaded from your .env file
 # as shown in the original code. For this example, they are hardcoded
 # to make the code self-contained and runnable.
-OWM_API_KEY = 'c9e4f702cc39e83c223bb81911f03aa8'
+OWM_API_KEY = '---------'
 
 # ========================================================================
 #   WEATHER FORECAST TOOL (with human-readable summary)
